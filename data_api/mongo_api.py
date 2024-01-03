@@ -23,59 +23,59 @@ if __name__ == '__main__':
 
     # Thing, Property 리스트
     data_list = [
-        ["DG2Thing", "BrgDE_Temp1"]
-        , ["DG2Thing", "BrgDE_Temp2"]
-        , ["DG2Thing", "BrgDE_Temp3"]
-        , ["DG2Thing", "BrgDE_Temp4"]
-        , ["DG2Thing", "BrgDE_Temp5"]
-        , ["DG2Thing", "BrgDE_Temp6"]
-        , ["DG2Thing", "BrgDE_Temp7"]
-        , ["DG2Thing", "BrgDE_Temp8"]
-        , ["DG2Thing", "BrgDE_Temp9"]
-        , ["DG2Thing", "BrgDE_Temp10"]
-        , ["DG2Thing", "BrgDE_Temp11"]
-        , ["DG2Thing", "BrgDE_Temp12"]
-        , ["DE2Thing", "Cy1ExhGasOutletTemp"]
-        , ["DE2Thing", "Cy2ExhGasOutletTemp"]
-        , ["DE2Thing", "Cy3ExhGasOutletTemp"]
-        , ["DE2Thing", "Cy4ExhGasOutletTemp"]
-        , ["DE2Thing", "Cy5ExhGasOutletTemp"]
-        , ["DE2Thing", "Cy6ExhGasOutletTemp"]
-        , ["DE2Thing", "Cy7ExhGasOutletTemp"]
-        , ["DE2Thing", "Cy8ExhGasOutletTemp"]
-        , ["DE2Thing", "Cy9ExhGasOutletTemp"]
-        , ["DE2Thing", "Cyl1_Pmax"]
-        , ["DE2Thing", "Cy21_Pmax"]
-        , ["DE2Thing", "Cy31_Pmax"]
-        , ["DE2Thing", "Cy41_Pmax"]
-        , ["DE2Thing", "Cy51_Pmax"]
-        , ["DE2Thing", "Cy61_Pmax"]
-        , ["DE2Thing", "Cy71_Pmax"]
-        , ["DE2Thing", "Cy81_Pmax"]
-        , ["DE2Thing", "Cy91_Pmax"]
-        , ["DE2Thing", "Load"]
-        , ["DE2Thing", "Power"]
+        ["DG1Thing", "BrgDE_Temp1"]
+        , ["DG1Thing", "BrgDE_Temp2"]
+        , ["DG1Thing", "BrgDE_Temp3"]
+        , ["DG1Thing", "BrgDE_Temp4"]
+        , ["DG1Thing", "BrgDE_Temp5"]
+        , ["DG1Thing", "BrgDE_Temp6"]
+        , ["DG1Thing", "BrgDE_Temp7"]
+        , ["DG1Thing", "BrgDE_Temp8"]
+        , ["DG1Thing", "BrgDE_Temp9"]
+        , ["DG1Thing", "BrgDE_Temp10"]
+        , ["DG1Thing", "BrgDE_Temp11"]
+        , ["DG1Thing", "BrgDE_Temp12"]
+        , ["DE1Thing", "Cy1ExhGasOutletTemp"]
+        , ["DE1Thing", "Cy2ExhGasOutletTemp"]
+        , ["DE1Thing", "Cy3ExhGasOutletTemp"]
+        , ["DE1Thing", "Cy4ExhGasOutletTemp"]
+        , ["DE1Thing", "Cy5ExhGasOutletTemp"]
+        , ["DE1Thing", "Cy6ExhGasOutletTemp"]
+        , ["DE1Thing", "Cy7ExhGasOutletTemp"]
+        , ["DE1Thing", "Cy8ExhGasOutletTemp"]
+        , ["DE1Thing", "Cy9ExhGasOutletTemp"]
+        , ["DE1Thing", "Cyl1_Pmax"]
+        , ["DE1Thing", "Cy21_Pmax"]
+        , ["DE1Thing", "Cy31_Pmax"]
+        , ["DE1Thing", "Cy41_Pmax"]
+        , ["DE1Thing", "Cy51_Pmax"]
+        , ["DE1Thing", "Cy61_Pmax"]
+        , ["DE1Thing", "Cy71_Pmax"]
+        , ["DE1Thing", "Cy81_Pmax"]
+        , ["DE1Thing", "Cy91_Pmax"]
+        , ["DE1Thing", "Load"]
+        , ["DE1Thing", "Power"]
     ]
 
 
 
     # 입력 정보
-    shpi_number = "ISS_HMD8310"
-    from_date = datetime.datetime(2023, 9, 24, 2, 0, 0)
-    to_date = datetime.datetime(2023, 9, 30, 23, 59, 59)
+    ship_number = "HDGRC7F_W"
+    from_date = datetime.datetime(2024, 1, 1, 12, 0, 0)
+    to_date = datetime.datetime(2024, 1, 3, 18, 0, 0)
     _thing0, _property0 = data_list[0]      # 첫번째 선택
     _thing1, _property1 = data_list[1]      # 두번째 선택
 
     body = {
         "collection": "tag_datas",
-        "database": "sample-test-aiins",
+        "database": "dev-hipom",
         "dataSource": "aiins-tv-test",
         "pipeline": [
             {
                 "$match": {
                     "$and": [
                         {
-                            "metadata.ship_number": {"$eq": shpi_number}
+                            "metadata.ship_number": {"$eq": ship_number}
                         },
                         {
                             "$or": [
