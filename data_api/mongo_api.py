@@ -3,69 +3,79 @@
 import datetime
 import json
 import requests
+import csv
+import matplotlib.pyplot as plt
+from matplotlib import dates
 
 # Press Alt+Shift+X to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
-
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    # 주소
+    # URL
     url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-zxdhn/endpoint/data/v1/action/aggregate"
 
-    # API 요청 헤더
+    # API request headers
     headers = {
         'Content-type': 'application/json',
         'Accept': 'text/plain',
         'apiKey': 'ipfQPuBNhC2wMB9VKM4ikgCQeoXJMtl4e06bf4WsMbXvGZbyTwKtd4IHInes8z1E'
     }
 
-    # Thing, Property 리스트
+    # List of Things and Properties
     data_list = [
-        ["DG1Thing", "BrgDE_Temp1"]
-        , ["DG1Thing", "BrgDE_Temp2"]
-        , ["DG1Thing", "BrgDE_Temp3"]
-        , ["DG1Thing", "BrgDE_Temp4"]
-        , ["DG1Thing", "BrgDE_Temp5"]
-        , ["DG1Thing", "BrgDE_Temp6"]
-        , ["DG1Thing", "BrgDE_Temp7"]
-        , ["DG1Thing", "BrgDE_Temp8"]
-        , ["DG1Thing", "BrgDE_Temp9"]
-        , ["DG1Thing", "BrgDE_Temp10"]
-        , ["DG1Thing", "BrgDE_Temp11"]
-        , ["DG1Thing", "BrgDE_Temp12"]
-        , ["DE1Thing", "Cy1ExhGasOutletTemp"]
-        , ["DE1Thing", "Cy2ExhGasOutletTemp"]
-        , ["DE1Thing", "Cy3ExhGasOutletTemp"]
-        , ["DE1Thing", "Cy4ExhGasOutletTemp"]
-        , ["DE1Thing", "Cy5ExhGasOutletTemp"]
-        , ["DE1Thing", "Cy6ExhGasOutletTemp"]
-        , ["DE1Thing", "Cy7ExhGasOutletTemp"]
-        , ["DE1Thing", "Cy8ExhGasOutletTemp"]
-        , ["DE1Thing", "Cy9ExhGasOutletTemp"]
-        , ["DE1Thing", "Cyl1_Pmax"]
-        , ["DE1Thing", "Cy21_Pmax"]
-        , ["DE1Thing", "Cy31_Pmax"]
-        , ["DE1Thing", "Cy41_Pmax"]
-        , ["DE1Thing", "Cy51_Pmax"]
-        , ["DE1Thing", "Cy61_Pmax"]
-        , ["DE1Thing", "Cy71_Pmax"]
-        , ["DE1Thing", "Cy81_Pmax"]
-        , ["DE1Thing", "Cy91_Pmax"]
-        , ["DE1Thing", "Load"]
-        , ["DE1Thing", "Power"]
+        ["DG1Thing", "BrgDE_Temp1"],
+        ["DG1Thing", "BrgDE_Temp2"],
+        ["DG1Thing", "BrgDE_Temp3"],
+        ["DG1Thing", "BrgDE_Temp4"],
+        ["DG1Thing", "BrgDE_Temp5"],
+        ["DG1Thing", "BrgDE_Temp6"],
+        ["DG1Thing", "BrgDE_Temp7"],
+        ["DG1Thing", "BrgDE_Temp8"],
+        ["DG1Thing", "BrgDE_Temp9"],
+        ["DG1Thing", "BrgDE_Temp10"],
+        ["DG1Thing", "BrgDE_Temp11"],
+        ["DG1Thing", "BrgDE_Temp12"],
+        ["DE1Thing", "Cy1ExhGasOutletTemp"],
+        ["DE1Thing", "Cy2ExhGasOutletTemp"],
+        ["DE1Thing", "Cy3ExhGasOutletTemp"],
+        ["DE1Thing", "Cy4ExhGasOutletTemp"],
+        ["DE1Thing", "Cy5ExhGasOutletTemp"],
+        ["DE1Thing", "Cy6ExhGasOutletTemp"],
+        ["DE1Thing", "Cy7ExhGasOutletTemp"],
+        ["DE1Thing", "Cy8ExhGasOutletTemp"],
+        ["DE1Thing", "Cy9ExhGasOutletTemp"],
+        ["DE1Thing", "Cyl1_Pmax"],
+        ["DE1Thing", "Cy21_Pmax"],
+        ["DE1Thing", "Cy31_Pmax"],
+        ["DE1Thing", "Cy41_Pmax"],
+        ["DE1Thing", "Cy51_Pmax"],
+        ["DE1Thing", "Cy61_Pmax"],
+        ["DE1Thing", "Cy71_Pmax"],
+        ["DE1Thing", "Cy81_Pmax"],
+        ["DE1Thing", "Cy91_Pmax"],
+        ["DE1Thing", "Load"],
+        ["DE1Thing", "Power"]
     ]
 
-
-
-    # 입력 정보
+    # Input information
     ship_number = "HDGRC7F_W"
-    from_date = datetime.datetime(2024, 1, 1, 12, 0, 0)
-    to_date = datetime.datetime(2024, 1, 3, 18, 0, 0)
-    _thing0, _property0 = data_list[0]      # 첫번째 선택
-    _thing1, _property1 = data_list[1]      # 두번째 선택
+    from_date = datetime.datetime(2024, 1, 2, 3, 0, 0)
+    to_date = datetime.datetime(2024, 1, 2, 9, 0, 0)
 
+    # Constructing the $or clause dynamically based on data_list
+    or_clauses = []
+    for thing, prop in data_list:
+        or_clauses.append(
+            {
+                "$and": [
+                    {"metadata.thing": {"$eq": thing}},
+                    {"metadata.property": {"$eq": prop}}
+                ]
+            }
+        )
+        
     body = {
         "collection": "tag_datas",
         "database": "dev-hipom",
@@ -74,37 +84,10 @@ if __name__ == '__main__':
             {
                 "$match": {
                     "$and": [
+                        {"metadata.ship_number": {"$eq": ship_number}},
+                        {"$or": or_clauses},
                         {
-                            "metadata.ship_number": {"$eq": ship_number}
-                        },
-                        {
-                            "$or": [
-                                {   # 첫번째 선택
-                                    "$and": [
-                                        {
-                                            "metadata.thing": {"$eq": _thing0}
-                                        },
-                                        {
-                                            "metadata.property": {"$eq": _property0}
-                                        }
-                                    ]
-                                },
-                                {   # 두번째 선택
-                                    "$and": [
-                                        {
-                                            "metadata.thing": {"$eq": _thing1}
-                                        },
-                                        {
-                                            "metadata.property": {"$eq": _property1}
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "timestamp": {
-                                # "$gte": from_date.isoformat(),
-                                # "$lt": to_date.isoformat()
+                            "src_time": {
                                 "$gte": {"$date": from_date.isoformat() + ".000Z"},
                                 "$lt": {"$date": to_date.isoformat() + ".000Z"}
                             }
@@ -118,10 +101,11 @@ if __name__ == '__main__':
                         "ship_number": "$metadata.ship_number",
                         "thing": "$metadata.thing",
                         "property": "$metadata.property",
-                        "year": {"$year": "$timestamp"},
-                        "month": {"$month": "$timestamp"},
-                        "day": {"$dayOfMonth": "$timestamp"},
-                        "hour": {"$hour": "$timestamp"}
+                        "year": {"$year": "$src_time"},
+                        "month": {"$month": "$src_time"},
+                        "day": {"$dayOfMonth": "$src_time"},
+                        "hour": {"$hour": "$src_time"},
+                        "minute": {"$minute": "$src_time"}  # Add minute information
                     },
                     "averageValue": {"$avg": "$value"}
                 }
@@ -145,8 +129,6 @@ if __name__ == '__main__':
                             "day": "$_id.day",
                             "hour": "$_id.hour",
                             "minute": "$_id.minute",
-                            "second": "$_id.second",
-                            "millisecond": "$_id.millisecond",
                             "value": "$averageValue"
                         }
                     }
@@ -154,65 +136,103 @@ if __name__ == '__main__':
             }
         ]
     }
-
-    # API 콜
+    # API call
     response = requests.post(url, headers=headers, json=body)
     response_dict = response.json()
     response_string = json.dumps(response_dict)
-    print("response = ", response_string)
+    # print("response = ", response_string)
+
+    # 2 arrays
+    datas = []
+    # First line
+    date_items = ["name"]
+
+    cursor_date = from_date
+    while cursor_date < to_date:
+        # YYYY-MM-DD HH:MM:SS.MS
+        date_items.append(cursor_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3])
+        cursor_date += datetime.timedelta(minutes=1)
+    datas.append(date_items)
 
     
-    # CSV 저장
-    csv_file_name = "tag_datas_file.csv"
-    with open(csv_file_name, "w") as file_stream:
+    documents_list = response_dict["documents"]
+    for index, document_object in enumerate(documents_list):
+        _id_object = document_object["_id"]
+        _ship_number = _id_object["ship_number"]
+        _thing = _id_object["thing"]
+        _property = _id_object["property"]
+        items_list = document_object["items"]
 
-        # 첫번째 라인
-        date_items = ["ship_number", "thing", "property"]
         cursor_date = from_date
-        while cursor_date <= to_date:
-            # YYYY-MM-DD HH:MM:SS.MS
-            date_items.append(cursor_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3])
-            cursor_date += datetime.timedelta(hours=1)
-        line_string = ",".join(date_items) + "\n"
-        file_stream.write(line_string)
+        line_items = [_thing + "/" + _property]
+        for idx, item_object in enumerate(items_list):
+            _year = item_object["year"]
+            _month = item_object["month"]
+            _day = item_object["day"]
+            _hour = item_object["hour"]
+            _minute = item_object["minute"]
+            _value = item_object["value"]
 
-        documents_list = response_dict["documents"]
-        for index, document_object in enumerate(documents_list):
-            _id_object = document_object["_id"]
-            _ship_number = _id_object["ship_number"]
-            _thing = _id_object["thing"]
-            _property = _id_object["property"]
-            items_list = document_object["items"]
+            # Convert to datetime for hourly comparison
+            _date = datetime.datetime(
+                _year, _month, _day,
+                _hour, _minute, 0, 0,
+                from_date.tzinfo)
 
-            cursor_date = from_date
-            line_items = [_ship_number, _thing, _property]
-            for idx, item_object in enumerate(items_list):
-                _year = item_object["year"]
-                _month = item_object["month"]
-                _day = item_object["day"]
-                _hour = item_object["hour"]
-                _value = item_object["value"]
+            # Iterate through each minute until _date
+            while cursor_date <= _date:
+                # Check if cursor_date matches the current minute in _date
+                if (cursor_date.year == _date.year) \
+                        and (cursor_date.month == _date.month) \
+                        and (cursor_date.day == _date.day) \
+                        and (cursor_date.hour == _date.hour) \
+                        and (cursor_date.minute == _date.minute):
+                    # If data is present, set the value
+                    line_items.append(_value)
+                else:
+                    # If data is not present, set an empty string
+                    line_items.append("")
+                cursor_date += datetime.timedelta(minutes=1)
 
-                # hour 단위 비교를 위해 datetime으로 변환
-                _date = datetime.datetime(
-                    _year, _month, _day,
-                    _hour, 0, 0, 0,
-                    from_date.tzinfo)
+        empty_count = 0
+        # Loop through line_items to count empty strings
+        for value in line_items:
+            if value == "":
+                empty_count += 1
+        datas.append(line_items)
 
-                while cursor_date <= _date:
-                    # YYYY-MM-DD HH:MM:SS.MS
-                    if (cursor_date.year == _date.year) \
-                            and (cursor_date.month == _date.month) \
-                            and (cursor_date.day == _date.day) \
-                            and (cursor_date.hour == _date.hour):
-                        # 데이터가 있을 때, value 세팅
-                        line_items.append(str(_value))
-                    else:
-                        # 데이터가 없을 때, 빈값 세팅
-                        line_items.append("")
-                    cursor_date += datetime.timedelta(hours=1)
-            line_string = ",".join(line_items)
-            if index != (len(documents_list) - 1):
-                line_string += "\n"
-            file_stream.write(line_string)
-    pass
+
+
+    # # Save datas to a CSV file
+    csv_file_path = "datas.csv"
+
+    with open(csv_file_path, 'w', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerows(datas)
+
+
+    # Extracting x-axis (time) and y-axis (values) data
+    data_series = datas[1:]  # Remaining lists are data series
+    time_labels = date_items[1:len(data_series[0])]
+    
+    # Creating a plot for each data series
+    for data_series_item in data_series:
+        series_label = data_series_item[0]
+        series_data = [float(value) if value != '' else None for value in data_series_item[1:]]  # Convert values to float
+
+        # Plotting the data series
+        plt.plot(time_labels, series_data, label=series_label)
+
+    # Adding labels and legend
+    plt.xlabel('Time')
+    plt.ylabel('Value')
+    plt.title('Data Series Chart')
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+    # Rotate x-axis labels for better readability
+    plt.xticks(rotation=45, ha='right')
+    plt.locator_params(axis='x', nbins=len(time_labels) // 20)  # Adjust the number of ticks
+
+    # Display the plot
+    plt.tight_layout()  # Adjust layout to prevent clipping of labels
+    plt.show()
